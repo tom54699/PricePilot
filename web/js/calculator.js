@@ -3,6 +3,7 @@
 
 export class PriceCalculator {
   constructor() {
+    // Default labels (display only; not used in pricing)
     this.hourlyRates = {
       初級開發: 800,
       中級開發: 1200,
@@ -27,6 +28,7 @@ export class PriceCalculator {
     };
 
     this.taxRate = 0.05;
+    this.baseHourlyRate = 1200; // 僅用此基礎時薪計算，不依賴類型
   }
 
   validateTaskInput(task) {
@@ -40,7 +42,8 @@ export class PriceCalculator {
   }
 
   calculateItemPrice(taskType, hours, complexity = '中等', risk = '中風險', description = '') {
-    const base = this.hourlyRates[taskType] ?? this.hourlyRates['中級開發'];
+    // 類型僅作為標題，不影響價格
+    const base = Number(this.baseHourlyRate);
     const h = Math.max(0, Number(hours || 0));
     const c = this.complexityMultiplier[complexity] ?? this.complexityMultiplier['中等'];
     const r = this.riskMultiplier[risk] ?? this.riskMultiplier['中風險'];
@@ -90,4 +93,3 @@ export class PriceCalculator {
 }
 
 if (typeof window !== 'undefined') window.PriceCalculator = PriceCalculator;
-

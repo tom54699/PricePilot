@@ -3,6 +3,61 @@ import { exportQuoteToXlsx } from './export.js';
 
 const calc = new PriceCalculator();
 
+// 自訂類型（僅標題）設定
+const TYPE_KEY = 'pricepilot_types_v1';
+function loadTypes() {
+  try {
+    const raw = localStorage.getItem(TYPE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return Object.keys(calc.hourlyRates || {});
+}
+function saveTypes(types) {
+  localStorage.setItem(TYPE_KEY, JSON.stringify(types));
+}
+let typeLabels = loadTypes();
+function renderTypeManager() {
+  const listEl = document.getElementById('typeList');
+  if (!listEl) return;
+  listEl.innerHTML = '';
+  typeLabels.forEach((label, idx) => {
+    const badge = document.createElement('span');
+    badge.className = 'badge bg-secondary me-2 mb-2';
+    badge.textContent = label;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn-sm btn-outline-light ms-2';
+    btn.textContent = '×';
+    btn.title = '刪除';
+    btn.addEventListener('click', () => {
+      typeLabels.splice(idx, 1);
+      saveTypes(typeLabels);
+      renderTypeManager();
+      // 不改變既有列的值，但新增列會用更新後清單
+    });
+    const wrapper = document.createElement('span');
+    wrapper.className = 'd-inline-flex align-items-center';
+    wrapper.appendChild(badge);
+    wrapper.appendChild(btn);
+    listEl.appendChild(wrapper);
+  });
+}
+function wireTypeAdd() {
+  const addBtn = document.getElementById('addTypeBtn');
+  const input = document.getElementById('newTypeInput');
+  if (!addBtn || !input) return;
+  addBtn.addEventListener('click', () => {
+    const name = input.value.trim();
+    if (!name) return;
+    if (!typeLabels.includes(name)) {
+      typeLabels.push(name);
+      saveTypes(typeLabels);
+      renderTypeManager();
+      input.value = '';
+    }
+  });
+}
+
 const tasksTbody = document.querySelector('#tasksTable tbody');
 const addTaskBtn = document.getElementById('addTask');
 const projectNameEl = document.getElementById('projectName');
@@ -31,9 +86,7 @@ function addTaskRow(prefill) {
   tr.innerHTML = `
     <td>
       <select class="form-select form-select-sm">
-        ${Object.keys(calc.hourlyRates)
-          .map((k) => `<option value="${k}">${k}</option>`)
-          .join('')}
+        ${typeLabels.map((k) => `<option value="${k}">${k}</option>`).join('')}
       </select>
     </td>
     <td>
@@ -84,6 +137,8 @@ addTaskBtn?.addEventListener('click', addTaskRow);
 // add a default row
 addTaskRow();
 setSaveStatus('尚未儲存草稿');
+renderTypeManager();
+wireTypeAdd();
 
 function collectTasks() {
   const rows = tasksTbody.querySelectorAll('tr');
