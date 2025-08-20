@@ -10,7 +10,10 @@ function loadTypes() {
     const raw = localStorage.getItem(TYPE_KEY);
     if (raw) {
       const arr = JSON.parse(raw);
-      if (Array.isArray(arr) && arr.length > 0) return arr;
+      if (Array.isArray(arr)) {
+        const cleaned = arr.filter((x) => typeof x === 'string' && x.trim().length > 0);
+        if (cleaned.length > 0) return cleaned;
+      }
       // guard against empty stored list
     }
   } catch {}
@@ -159,7 +162,7 @@ function wireTypeAdd() {
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       if (!confirm('確定要重設為預設類型？')) return;
-      const defaults = Object.keys(calc.hourlyRates || {});
+      const defaults = Object.keys(calc.hourlyRates || {}).filter((x) => String(x).trim().length > 0);
       typeLabels = defaults.length ? defaults : ['一般'];
       saveTypes(typeLabels);
       renderTypeManager();
