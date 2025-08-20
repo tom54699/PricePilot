@@ -1,21 +1,22 @@
 from src.python import PriceCalculator
+from src.python.price_calculator import export_to_excel
 
 
 def main() -> None:
-    calc = PriceCalculator(tax_rate=0.05, currency="USD")
+    calc = PriceCalculator()
 
     tasks = [
-        {"name": "Design", "hours": 10, "rate": 80},
-        {"name": "Development", "hours": 25, "rate": 120, "multiplier": 1.1},
+        {"type": "中級開發", "hours": 10, "complexity": "中等", "risk": "中風險", "description": "Backend APIs"},
+        {"type": "UI/UX設計", "hours": 12, "complexity": "簡單", "risk": "低風險", "description": "Wireframes"},
     ]
-    additional = {"Hosting": 50}
+    additional = {"主機費用": 500, "網域費用": 300}
 
-    quote = calc.calculate(tasks, additional)
-    print(f"Subtotal: {quote['subtotal']} {calc.currency}")
-    print(f"Tax:      {quote['tax']} {calc.currency}")
-    print(f"Total:    {quote['total']} {calc.currency}")
+    quote = calc.create_quote("PricePilot", "ACME Corp", tasks, additional)
+    print("含稅總計:", quote["含稅總計"], calc.currency)
+
+    path = export_to_excel(quote)
+    print("Excel exported:", path)
 
 
 if __name__ == "__main__":
     main()
-

@@ -1,10 +1,10 @@
 # 實作計劃
 
-- [ ] 1. 修復現有 Python 代碼問題
-  - 修復 PriceCalculator 類別中的縮排錯誤
-  - 確保 create_quote 方法正確定義在類別內
-  - 修復 export_to_excel 方法的縮排問題
-  - 驗證所有方法都能正常執行
+- [x] 1. 修復現有 Python 代碼問題
+  - [x] 修復 PriceCalculator 類別中的縮排錯誤
+  - [x] 確保 create_quote 方法正確定義在類別內
+  - [x] 修復 export_to_excel 方法的縮排問題（以 openpyxl 實作）
+  - [x] 驗證所有方法都能正常執行（新增 Python 單元測試與 example）
   - _需求: 1.1, 1.2, 1.3, 1.4_
 
 - [ ] 2. 建立基本的 HTML 介面結構
@@ -37,11 +37,11 @@
   - 添加檔案下載功能
   - _需求: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 6. 建立專案檔案結構和設定
-  - 建立完整的專案目錄結構
-  - 建立 package.json 檔案
-  - 設定開發和建置腳本
-  - 建立 .gitignore 檔案
+- [x] 6. 建立專案檔案結構和設定
+  - [x] 建立完整的專案目錄結構
+  - [x] 建立 package.json 檔案（web/）
+  - [x] 設定開發和建置腳本（占位 build、測試指令）
+  - [x] 建立 .gitignore 檔案
   - _需求: 所有需求的基礎設施_
 
 - [ ] 7. 設定 GitHub Actions 自動部署
