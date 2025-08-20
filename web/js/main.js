@@ -387,7 +387,8 @@ function addTaskRow(prefill) {
   });
   tasksTbody.appendChild(tr);
 
-  if (prefill) {
+  // 嚴格判斷：只有真正的預填資料才進入此分支（避免事件物件誤用）
+  if (prefill && typeof prefill === 'object' && !('isTrusted' in prefill)) {
     const [typeSel, hoursInput, compSel, riskSel, descInput] = tr.querySelectorAll('select, input');
     if (prefill.type) typeSel.value = prefill.type;
     if (typeof prefill.hours !== 'undefined') hoursInput.value = prefill.hours;
@@ -397,11 +398,17 @@ function addTaskRow(prefill) {
   } else {
     // set default selection to first option
     const typeSel = tr.querySelector('td:first-child select');
-    if (typeSel && options.length) typeSel.value = options[0];
+    if (typeSel && options.length) {
+      typeSel.selectedIndex = 0;
+      typeSel.value = options[0];
+      // 觸發一次 change，確保 UI 立即顯示
+      typeSel.dispatchEvent(new Event('change', { bubbles: true }));
+    }
   }
 }
 
-addTaskBtn?.addEventListener('click', addTaskRow);
+// 重要：不要把事件物件當成預填資料傳入
+addTaskBtn?.addEventListener('click', () => addTaskRow());
 // add a default row
 addTaskRow();
 setSaveStatus('尚未儲存草稿');
