@@ -413,8 +413,10 @@ function collectTasks() {
   const tasks = [];
   rows.forEach((tr) => {
     const [typeSel, hoursInput, compSel, riskSel, descInput] = tr.querySelectorAll('select, input');
+    const fallbackType = (typeLabels && typeLabels.length ? typeLabels[0] : '一般');
+    const typeValue = (typeSel && typeSel.value && typeSel.value.trim()) ? typeSel.value : fallbackType;
     tasks.push({
-      type: typeSel.value,
+      type: typeValue,
       hours: Number(hoursInput.value || 0),
       complexity: compSel.value,
       risk: riskSel.value,
