@@ -141,8 +141,9 @@ function wireTypeAdd() {
       typeLabels.push(name);
       saveTypes(typeLabels);
       renderTypeManager();
+      refreshTaskTypeSelects();
       input.value = '';
-      setTypeMsg('已新增類型');
+      setTypeMsg('已新增類型並套用');
     };
     addBtn.addEventListener('click', add);
     input.addEventListener('keydown', (e) => {
@@ -174,6 +175,137 @@ function refreshTaskTypeSelects() {
       typeSel.value = typeLabels[0];
     }
   });
+}
+
+// 複雜度/風險 倍率設定（持久化 + 自動套用）
+const CM_KEY = 'pricepilot_complexity_v1';
+const RM_KEY = 'pricepilot_risk_v1';
+function loadMap(key, fallback) {
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { ...fallback };
+}
+function saveMap(key, obj) {
+  localStorage.setItem(key, JSON.stringify(obj));
+}
+
+let complexityMap = loadMap(CM_KEY, calc.complexityMultiplier);
+let riskMap = loadMap(RM_KEY, calc.riskMultiplier);
+// apply on startup
+calc.complexityMultiplier = { ...complexityMap };
+calc.riskMultiplier = { ...riskMap };
+
+function renderMapList(containerId, obj, { step = '0.1' } = {}) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  container.innerHTML = '';
+  const table = document.createElement('table');
+  table.className = 'table table-sm align-middle';
+  const tbody = document.createElement('tbody');
+  Object.entries(obj).forEach(([name, val]) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td class="w-50"><input class="form-control form-control-sm" value="${name}" /></td>
+      <td class="w-25"><input type="number" step="${step}" min="0" class="form-control form-control-sm" value="${val}" /></td>
+      <td class="w-25 text-end"><button class="btn btn-sm btn-outline-danger">刪除</button></td>
+    `;
+    const [nameInput, valueInput] = tr.querySelectorAll('input');
+    const delBtn = tr.querySelector('button');
+    nameInput.addEventListener('change', () => {
+      const newName = nameInput.value.trim();
+      if (!newName || newName === name) return;
+      if (Object.prototype.hasOwnProperty.call(obj, newName)) return; // duplicate, ignore
+      const currentVal = obj[name];
+      delete obj[name];
+      obj[newName] = Number(valueInput.value || currentVal);
+      calc.complexityMultiplier = { ...complexityMap };
+      calc.riskMultiplier = { ...riskMap };
+      saveMap(containerId === 'complexityList' ? CM_KEY : RM_KEY, obj);
+      renderAllMaps();
+      refreshCRSelects();
+      recalc();
+    });
+    valueInput.addEventListener('input', () => {
+      obj[name] = Number(valueInput.value || 0);
+      calc.complexityMultiplier = { ...complexityMap };
+      calc.riskMultiplier = { ...riskMap };
+      saveMap(containerId === 'complexityList' ? CM_KEY : RM_KEY, obj);
+      recalc();
+    });
+    delBtn.addEventListener('click', () => {
+      if (!confirm(`刪除「${name}」？`)) return;
+      delete obj[name];
+      calc.complexityMultiplier = { ...complexityMap };
+      calc.riskMultiplier = { ...riskMap };
+      saveMap(containerId === 'complexityList' ? CM_KEY : RM_KEY, obj);
+      renderAllMaps();
+      refreshCRSelects();
+      recalc();
+    });
+    tbody.appendChild(tr);
+  });
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+function refreshCRSelects() {
+  const rows = tasksTbody.querySelectorAll('tr');
+  rows.forEach((tr) => {
+    const compSel = tr.querySelector('td:nth-child(3) select');
+    const riskSel = tr.querySelector('td:nth-child(4) select');
+    if (compSel) {
+      const compCurrent = compSel.value;
+      compSel.innerHTML = Object.keys(complexityMap)
+        .map((k) => `<option value="${k}">${k}</option>`)
+        .join('');
+      if (Object.prototype.hasOwnProperty.call(complexityMap, compCurrent)) compSel.value = compCurrent;
+    }
+    if (riskSel) {
+      const riskCurrent = riskSel.value;
+      riskSel.innerHTML = Object.keys(riskMap)
+        .map((k) => `<option value="${k}">${k}</option>`)
+        .join('');
+      if (Object.prototype.hasOwnProperty.call(riskMap, riskCurrent)) riskSel.value = riskCurrent;
+    }
+  });
+}
+
+function renderAllMaps() {
+  renderMapList('complexityList', complexityMap, { step: '0.1' });
+  renderMapList('riskList', riskMap, { step: '0.1' });
+}
+
+function wireMapAdders() {
+  const cxName = document.getElementById('newComplexityName');
+  const cxVal = document.getElementById('newComplexityValue');
+  const cxBtn = document.getElementById('addComplexityBtn');
+  const rkName = document.getElementById('newRiskName');
+  const rkVal = document.getElementById('newRiskValue');
+  const rkBtn = document.getElementById('addRiskBtn');
+  const add = (kind) => {
+    const isCx = kind === 'cx';
+    const nameEl = isCx ? cxName : rkName;
+    const valEl = isCx ? cxVal : rkVal;
+    const map = isCx ? complexityMap : riskMap;
+    const key = isCx ? CM_KEY : RM_KEY;
+    const name = nameEl.value.trim();
+    const value = Number(valEl.value || 0);
+    if (!name) return;
+    if (Object.prototype.hasOwnProperty.call(map, name)) return;
+    map[name] = value;
+    saveMap(key, map);
+    calc.complexityMultiplier = { ...complexityMap };
+    calc.riskMultiplier = { ...riskMap };
+    renderAllMaps();
+    refreshCRSelects();
+    recalc();
+    nameEl.value = '';
+    valEl.value = '';
+  };
+  if (cxBtn) cxBtn.addEventListener('click', () => add('cx'));
+  if (rkBtn) rkBtn.addEventListener('click', () => add('rk'));
 }
 
 const tasksTbody = document.querySelector('#tasksTable tbody');
@@ -257,6 +389,9 @@ addTaskRow();
 setSaveStatus('尚未儲存草稿');
 renderTypeManager();
 wireTypeAdd();
+renderAllMaps();
+wireMapAdders();
+refreshCRSelects();
 
 function collectTasks() {
   const rows = tasksTbody.querySelectorAll('tr');

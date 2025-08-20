@@ -105,6 +105,37 @@
           </div>
         </div>
       </section>
+
+      <section class="card mt-4" id="multiplierManager">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="card-title h6 mb-0">倍率設定（複雜度 / 風險）</span>
+          <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#multiplierBody" aria-expanded="true" aria-controls="multiplierBody">收合/展開</button>
+        </div>
+        <div id="multiplierBody" class="collapse show">
+          <div class="card-body">
+            <div class="row g-4">
+              <div class="col-lg-6">
+                <h6>複雜度倍率</h6>
+                <div id="complexityList" class="mb-2"></div>
+                <div class="input-group input-group-sm" style="max-width: 420px;">
+                  <input id="newComplexityName" class="form-control" placeholder="新增名稱，如：超複雜" />
+                  <input id="newComplexityValue" class="form-control" type="number" step="0.1" min="0" placeholder="倍率，例如：2.2" />
+                  <button id="addComplexityBtn" class="btn btn-outline-primary" type="button">新增</button>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <h6>風險倍率</h6>
+                <div id="riskList" class="mb-2"></div>
+                <div class="input-group input-group-sm" style="max-width: 420px;">
+                  <input id="newRiskName" class="form-control" placeholder="新增名稱，如：極高風險" />
+                  <input id="newRiskValue" class="form-control" type="number" step="0.1" min="0" placeholder="倍率，例如：1.8" />
+                  <button id="addRiskBtn" class="btn btn-outline-primary" type="button">新增</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
