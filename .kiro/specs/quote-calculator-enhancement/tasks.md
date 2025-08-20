@@ -44,11 +44,11 @@
   - [x] 建立 .gitignore 檔案
   - _需求: 所有需求的基礎設施_
 
-- [ ] 7. 設定 GitHub Actions 自動部署
-  - 建立 .github/workflows/deploy.yml 檔案
-  - 設定自動化測試流程
-  - 設定 GitHub Pages 部署配置
-  - 測試自動部署流程
+- [x] 7. 設定 GitHub Actions 自動部署
+  - [x] 建立 .github/workflows/deploy.yml 檔案
+  - [x] 設定自動化測試流程（Python + Web）
+  - [x] 設定 GitHub Pages 部署配置（peaceiris/actions-gh-pages）
+  - [ ] 測試自動部署流程（需推送至 main 驗證）
   - _需求: 部署需求_
 
 - [x] 8. 建立單元測試

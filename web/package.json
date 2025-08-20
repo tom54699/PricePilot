@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "test": "vitest",
-    "build": "echo 'build step TBD'"
+    "build": "mkdir -p dist && cp -R index.html js dist/"
   },
   "devDependencies": {
     "vitest": "^1.6.0",
@@ -14,4 +14,3 @@
     "prettier": "^3.2.5"
   }
 }
-
