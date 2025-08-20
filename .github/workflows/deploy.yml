@@ -1,4 +1,4 @@
-name: CI and Deploy
+name: CI and Deploy (Pages)
 
 on:
   push:
@@ -6,12 +6,18 @@ on:
   pull_request:
     branches: [ main ]
 
-# Required for peaceiris/actions-gh-pages to push to gh-pages
+# Official GitHub Pages permissions
 permissions:
-  contents: write
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
-  test:
+  build-and-test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,8 +35,7 @@ jobs:
           pip install pytest pytest-cov
 
       - name: Run Python tests
-        run: |
-          pytest --cov=src/python -q
+        run: pytest --cov=src/python -q
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -39,38 +44,29 @@ jobs:
 
       - name: Install web deps
         working-directory: web
-        run: |
-          npm ci || npm install
+        run: npm ci || npm install
 
       - name: Run web tests
         working-directory: web
         run: npm test --silent
 
-  deploy:
-    needs: test
-    if: github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
-
-      - name: Install web deps
-        working-directory: web
-        run: |
-          npm ci || npm install
-
       - name: Build web
         working-directory: web
         run: npm run build
 
-      - name: Deploy to GitHub Pages
-        if: success()
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./web/dist
+          path: web/dist
+
+  deploy:
+    if: github.ref == 'refs/heads/main'
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
