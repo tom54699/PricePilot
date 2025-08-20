@@ -6,6 +6,10 @@ on:
   pull_request:
     branches: [ main ]
 
+# Required for peaceiris/actions-gh-pages to push to gh-pages
+permissions:
+  contents: write
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -70,4 +74,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./web/dist
-
