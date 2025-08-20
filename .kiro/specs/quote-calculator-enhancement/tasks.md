@@ -7,34 +7,34 @@
   - [x] 驗證所有方法都能正常執行（新增 Python 單元測試與 example）
   - _需求: 1.1, 1.2, 1.3, 1.4_
 
-- [ ] 2. 建立基本的 HTML 介面結構
-  - 建立 index.html 主頁面
-  - 整合 Bootstrap 5 CDN 樣式框架
-  - 建立報價表單的基本 HTML 結構
-  - 建立任務輸入區域和動態新增功能
+- [x] 2. 建立基本的 HTML 介面結構
+  - [x] 建立 index.html 主頁面
+  - [x] 整合 Bootstrap 5 CDN 樣式框架
+  - [x] 建立報價表單的基本 HTML 結構
+  - [x] 建立任務輸入區域和動態新增功能
   - _需求: 2.1, 2.2_
 
-- [ ] 3. 實作 JavaScript 計算邏輯
-  - 建立 PriceCalculator JavaScript 類別
-  - 移植 Python 的費率設定到 JavaScript
-  - 實作 calculateItemPrice 方法
-  - 實作 createQuote 方法
-  - 添加輸入驗證和錯誤處理
+- [x] 3. 實作 JavaScript 計算邏輯
+  - [x] 建立 PriceCalculator JavaScript 類別 (web/js/calculator.js)
+  - [x] 移植 Python 的費率設定到 JavaScript
+  - [x] 實作 calculateItemPrice 方法
+  - [x] 實作 createQuote 方法
+  - [x] 添加輸入驗證和錯誤處理
   - _需求: 3.1, 3.2, 3.3, 3.4_
 
-- [ ] 4. 建立互動式使用者介面
-  - 實作表單輸入處理邏輯
-  - 建立動態任務新增/刪除功能
-  - 實作即時價格計算和顯示
-  - 添加表單驗證和錯誤提示
+- [x] 4. 建立互動式使用者介面
+  - [x] 實作表單輸入處理邏輯 (web/js/main.js)
+  - [x] 建立動態任務新增/刪除功能
+  - [x] 實作即時價格計算和顯示（按鈕觸發）
+  - [ ] 添加表單驗證和錯誤提示（可再加強）
   - _需求: 2.3, 2.4_
 
-- [ ] 5. 實作 Excel 匯出功能
-  - 整合 SheetJS 函式庫
-  - 建立 Excel 檔案生成邏輯
-  - 實作報價摘要工作表生成
-  - 實作詳細項目工作表生成
-  - 添加檔案下載功能
+- [x] 5. 實作 Excel 匯出功能
+  - [x] 整合 SheetJS 函式庫（CDN）
+  - [x] 建立 Excel 檔案生成邏輯 (web/js/export.js)
+  - [x] 實作報價摘要工作表生成
+  - [x] 實作詳細項目工作表生成
+  - [x] 添加檔案下載功能
   - _需求: 4.1, 4.2, 4.3, 4.4_
 
 - [x] 6. 建立專案檔案結構和設定
@@ -51,11 +51,11 @@
   - 測試自動部署流程
   - _需求: 部署需求_
 
-- [ ] 8. 建立單元測試
-  - 建立 JavaScript 測試檔案
-  - 測試計算邏輯的正確性
-  - 測試邊界條件和錯誤處理
-  - 設定測試執行腳本
+- [x] 8. 建立單元測試
+  - [x] 建立 JavaScript 測試檔案 (web/__tests__/priceCalculator.test.ts)
+  - [x] 測試計算邏輯的正確性
+  - [x] 測試邊界條件和錯誤處理（部分）
+  - [x] 設定測試執行腳本 (package.json)
   - _需求: 1.4, 3.1, 3.2, 3.3, 3.4_
 
 - [ ] 9. 優化使用者體驗

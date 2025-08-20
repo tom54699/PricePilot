@@ -1,22 +1,26 @@
 import { describe, it, expect } from 'vitest';
-import { PriceCalculator } from '../js/priceCalculator.js';
+import { PriceCalculator } from '../js/calculator.js';
 
 describe('PriceCalculator (web)', () => {
-  it('computes basic totals', () => {
-    const calc = new PriceCalculator(0.1, 'USD');
-    const result = calc.calculate(
+  it('calculates item and quote per spec', () => {
+    const calc = new PriceCalculator();
+    const item = calc.calculateItemPrice('高級開發', 2, '複雜', '高風險');
+    // base 1800 * 1.8 * 1.5 = 4860 adjusted; subtotal = 9720
+    expect(item.調整後時薪).toBe(4860);
+    expect(item.小計).toBe(9720);
+
+    const quote = calc.createQuote(
+      'Proj',
+      'Client',
       [
-        { name: 'A', hours: 2, rate: 100 },
-        { name: 'B', hours: 1, rate: 200, multiplier: 1.5 },
+        { type: '高級開發', hours: 2, complexity: '複雜', risk: '高風險' },
+        { type: '測試', hours: 5, complexity: '簡單', risk: '低風險' },
       ],
-      { Shipping: 25 }
+      { 主機費用: 200 }
     );
 
-    // subtotal = 2*100 + 1*200*1.5 + 25 = 200 + 300 + 25 = 525
-    // tax = 52.5, total = 577.5
-    expect(result.subtotal).toBe(525);
-    expect(result.tax).toBe(52.5);
-    expect(result.total).toBe(577.5);
+    expect(quote.開發小計).toBe(9720 + 600 * 5);
+    expect(quote.額外費用.額外費用小計).toBe(200);
+    expect(quote.含稅總計).toBe(quote.稅前總計 + quote.營業稅);
   });
 });
-
