@@ -54,7 +54,8 @@ function renderTypeManager() {
       typeLabels.splice(idx - 1, 0, m);
       saveTypes(typeLabels);
       renderTypeManager();
-      setTypeMsg('已重新排序');
+      refreshTaskTypeSelects();
+      setTypeMsg('已重新排序並套用');
     });
 
     const downBtn = document.createElement('button');
@@ -68,7 +69,8 @@ function renderTypeManager() {
       typeLabels.splice(idx + 1, 0, m);
       saveTypes(typeLabels);
       renderTypeManager();
-      setTypeMsg('已重新排序');
+      refreshTaskTypeSelects();
+      setTypeMsg('已重新排序並套用');
     });
 
     const editBtn = document.createElement('button');
@@ -94,7 +96,8 @@ function renderTypeManager() {
         typeLabels[idx] = v;
         saveTypes(typeLabels);
         renderTypeManager();
-        setTypeMsg('已更新類型名稱');
+        refreshTaskTypeSelects();
+        setTypeMsg('已更新類型名稱並套用');
       };
       input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') save();
@@ -111,7 +114,8 @@ function renderTypeManager() {
       typeLabels.splice(idx, 1);
       saveTypes(typeLabels);
       renderTypeManager();
-      setTypeMsg('已刪除類型');
+      refreshTaskTypeSelects();
+      setTypeMsg('已刪除類型並套用');
     });
 
     right.appendChild(upBtn);
@@ -128,7 +132,6 @@ function renderTypeManager() {
 function wireTypeAdd() {
   const addBtn = document.getElementById('addTypeBtn');
   const input = document.getElementById('newTypeInput');
-  const applyBtn = document.getElementById('applyTypesBtn');
   const resetBtn = document.getElementById('resetTypesBtn');
   if (addBtn && input) {
     const add = () => {
@@ -144,12 +147,6 @@ function wireTypeAdd() {
     addBtn.addEventListener('click', add);
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') add();
-    });
-  }
-  if (applyBtn) {
-    applyBtn.addEventListener('click', () => {
-      refreshTaskTypeSelects();
-      setTypeMsg('已套用至任務清單');
     });
   }
   if (resetBtn) {

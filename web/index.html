@@ -86,24 +86,29 @@
       </div>
 
       <section class="card mt-4" id="typeManager">
-        <div class="card-body">
-          <h5 class="card-title">任務類型管理（僅標題，不影響價格）</h5>
-          <p class="text-muted small">提示：此處僅管理下拉選單的標籤，不影響計價。</p>
-          <div id="typeList" class="mb-3"></div>
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <div class="input-group input-group-sm" style="max-width: 420px;">
-              <input id="newTypeInput" class="form-control" placeholder="例如：資料分析、顧問、教育訓練" />
-              <button id="addTypeBtn" class="btn btn-outline-primary" type="button">新增</button>
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="card-title h6 mb-0">任務類型管理（僅標題，不影響價格）</span>
+          <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#typeManagerBody" aria-expanded="true" aria-controls="typeManagerBody">收合/展開</button>
+        </div>
+        <div id="typeManagerBody" class="collapse show">
+          <div class="card-body">
+            <p class="text-muted small">提示：此處僅管理下拉選單的標籤，不影響計價。</p>
+            <div id="typeList" class="mb-3"></div>
+            <div class="d-flex align-items-center gap-2 flex-wrap">
+              <div class="input-group input-group-sm" style="max-width: 420px;">
+                <input id="newTypeInput" class="form-control" placeholder="例如：資料分析、顧問、教育訓練" />
+                <button id="addTypeBtn" class="btn btn-outline-primary" type="button">新增</button>
+              </div>
+              <button id="resetTypesBtn" class="btn btn-sm btn-outline-danger" type="button">重設為預設</button>
+              <span id="typeMsg" class="small text-muted"></span>
             </div>
-            <button id="applyTypesBtn" class="btn btn-sm btn-secondary" type="button">套用到任務清單</button>
-            <button id="resetTypesBtn" class="btn btn-sm btn-outline-danger" type="button">重設為預設</button>
-            <span id="typeMsg" class="small text-muted"></span>
           </div>
         </div>
       </section>
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
     <script type="module" src="./js/calculator.js"></script>
     <script type="module" src="./js/export.js"></script>
     <script type="module" src="./js/main.js"></script>
