@@ -10,6 +10,7 @@ const clientNameEl = document.getElementById('clientName');
 const hostingEl = document.getElementById('hosting');
 const domainEl = document.getElementById('domain');
 const maintenanceEl = document.getElementById('maintenance');
+const formEl = document.getElementById('quote-form');
 
 const resultsCard = document.getElementById('results');
 const preTaxEl = document.getElementById('preTax');
@@ -22,11 +23,14 @@ function addTaskRow() {
     <td>
       <select class="form-select form-select-sm">
         ${Object.keys(calc.hourlyRates)
-          .map((k) => `<option value="${k}">${k}</option>`) 
+          .map((k) => `<option value="${k}">${k}</option>`)
           .join('')}
       </select>
     </td>
-    <td><input type="number" min="0" step="0.5" class="form-control form-control-sm" value="1" /></td>
+    <td>
+      <input type="number" min="0" step="0.5" class="form-control form-control-sm" value="1" required />
+      <div class="invalid-feedback">工時需為非負數</div>
+    </td>
     <td>
       <select class="form-select form-select-sm">
         ${Object.keys(calc.complexityMultiplier)
@@ -44,7 +48,14 @@ function addTaskRow() {
     <td><input type="text" class="form-control form-control-sm" placeholder="描述" /></td>
     <td><button type="button" class="btn btn-sm btn-outline-danger">刪除</button></td>
   `;
-  tr.querySelector('button').addEventListener('click', () => tr.remove());
+  tr.querySelector('button').addEventListener('click', () => {
+    tr.remove();
+    recalc();
+  });
+  tr.querySelectorAll('input, select').forEach((el) => {
+    el.addEventListener('input', recalc);
+    el.addEventListener('change', recalc);
+  });
   tasksTbody.appendChild(tr);
 }
 
@@ -68,6 +79,43 @@ function collectTasks() {
   return tasks;
 }
 
+function setInvalid(el, invalid) {
+  if (!el) return;
+  el.classList.toggle('is-invalid', !!invalid);
+}
+
+function validateForm() {
+  let valid = true;
+
+  if (!projectNameEl.value.trim()) {
+    setInvalid(projectNameEl, true);
+    valid = false;
+  } else setInvalid(projectNameEl, false);
+
+  if (!clientNameEl.value.trim()) {
+    setInvalid(clientNameEl, true);
+    valid = false;
+  } else setInvalid(clientNameEl, false);
+
+  [hostingEl, domainEl, maintenanceEl].forEach((el) => {
+    const v = Number(el.value);
+    const ok = Number.isFinite(v) && v >= 0;
+    setInvalid(el, !ok);
+    if (!ok) valid = false;
+  });
+
+  tasksTbody.querySelectorAll('tr').forEach((tr) => {
+    const hoursInput = tr.querySelector('input[type="number"]');
+    const v = Number(hoursInput.value);
+    const ok = Number.isFinite(v) && v >= 0;
+    setInvalid(hoursInput, !ok);
+    if (!ok) valid = false;
+  });
+
+  formEl?.classList.add('was-validated');
+  return { valid };
+}
+
 function showResults(quote) {
   preTaxEl.textContent = String(quote.稅前總計);
   taxEl.textContent = String(quote.營業稅);
@@ -75,7 +123,12 @@ function showResults(quote) {
   resultsCard.classList.remove('d-none');
 }
 
-document.getElementById('calcBtn')?.addEventListener('click', () => {
+function recalc() {
+  const { valid } = validateForm();
+  if (!valid) {
+    resultsCard.classList.add('d-none');
+    return;
+  }
   const quote = calc.createQuote(
     projectNameEl.value.trim(),
     clientNameEl.value.trim(),
@@ -87,9 +140,13 @@ document.getElementById('calcBtn')?.addEventListener('click', () => {
     }
   );
   showResults(quote);
-});
+}
+
+document.getElementById('calcBtn')?.addEventListener('click', recalc);
 
 document.getElementById('exportBtn')?.addEventListener('click', () => {
+  const { valid } = validateForm();
+  if (!valid) return;
   const quote = calc.createQuote(
     projectNameEl.value.trim(),
     clientNameEl.value.trim(),
@@ -103,3 +160,11 @@ document.getElementById('exportBtn')?.addEventListener('click', () => {
   exportQuoteToXlsx(quote);
 });
 
+// live recalculation for top-level fields
+[projectNameEl, clientNameEl, hostingEl, domainEl, maintenanceEl].forEach((el) => {
+  el?.addEventListener('input', recalc);
+  el?.addEventListener('change', recalc);
+});
+
+// initial compute
+recalc();

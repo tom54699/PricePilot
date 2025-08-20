@@ -15,15 +15,17 @@
     <main class="container py-4">
       <h1 class="mb-4">報價計算器</h1>
 
-      <form id="quote-form" class="mb-4">
+      <form id="quote-form" class="mb-4 needs-validation" novalidate>
         <div class="row g-3 mb-3">
           <div class="col-sm-6">
             <label class="form-label">專案名稱</label>
-            <input id="projectName" class="form-control" placeholder="My Project" />
+            <input id="projectName" class="form-control" placeholder="My Project" required />
+            <div class="invalid-feedback">請輸入專案名稱</div>
           </div>
           <div class="col-sm-6">
             <label class="form-label">客戶名稱</label>
-            <input id="clientName" class="form-control" placeholder="ACME Corp" />
+            <input id="clientName" class="form-control" placeholder="ACME Corp" required />
+            <div class="invalid-feedback">請輸入客戶名稱</div>
           </div>
         </div>
 
@@ -51,14 +53,17 @@
           <div class="col-sm-4">
             <label class="form-label">主機費用</label>
             <input id="hosting" type="number" min="0" class="form-control" value="0" />
+            <div class="invalid-feedback">請輸入有效的費用（>= 0）</div>
           </div>
           <div class="col-sm-4">
             <label class="form-label">網域費用</label>
             <input id="domain" type="number" min="0" class="form-control" value="0" />
+            <div class="invalid-feedback">請輸入有效的費用（>= 0）</div>
           </div>
           <div class="col-sm-4">
             <label class="form-label">維護費用</label>
             <input id="maintenance" type="number" min="0" class="form-control" value="0" />
+            <div class="invalid-feedback">請輸入有效的費用（>= 0）</div>
           </div>
         </div>
 
