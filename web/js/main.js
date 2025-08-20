@@ -112,6 +112,7 @@ function renderTypeManager() {
     delBtn.addEventListener('click', () => {
       if (!confirm(`確定刪除類型「${label}」？`)) return;
       typeLabels.splice(idx, 1);
+      if (typeLabels.length === 0) typeLabels = ['一般'];
       saveTypes(typeLabels);
       renderTypeManager();
       refreshTaskTypeSelects();
@@ -333,10 +334,11 @@ function setSaveStatus(msg) {
 
 function addTaskRow(prefill) {
   const tr = document.createElement('tr');
+  const options = (typeLabels && typeLabels.length ? typeLabels : ['一般']);
   tr.innerHTML = `
     <td>
       <select class="form-select form-select-sm">
-        ${typeLabels.map((k) => `<option value="${k}">${k}</option>`).join('')}
+        ${options.map((k) => `<option value="${k}">${k}</option>`).join('')}
       </select>
     </td>
     <td>
@@ -380,6 +382,10 @@ function addTaskRow(prefill) {
     if (prefill.complexity) compSel.value = prefill.complexity;
     if (prefill.risk) riskSel.value = prefill.risk;
     if (prefill.description) descInput.value = prefill.description;
+  } else {
+    // set default selection to first option
+    const typeSel = tr.querySelector('td:first-child select');
+    if (typeSel && options.length) typeSel.value = options[0];
   }
 }
 
@@ -480,8 +486,8 @@ function applySalaryToCalc() {
   // 將加班倍率算進時薪
   calc.baseHourlyRate = effective;
   calc.otMultiplier = 1;
-  const preview = document.getElementById('salaryPreview');
-  if (preview) preview.textContent = `${base} × ${otm} = ${effective}`;
+  const previewHeader = document.getElementById('salaryHeaderPreview');
+  if (previewHeader) previewHeader.textContent = `有效時薪：${effective}`;
   saveSalary({
     baseHourly: base,
     otMultiplier: otm,
