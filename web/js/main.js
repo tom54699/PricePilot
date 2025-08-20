@@ -8,9 +8,14 @@ const TYPE_KEY = 'pricepilot_types_v1';
 function loadTypes() {
   try {
     const raw = localStorage.getItem(TYPE_KEY);
-    if (raw) return JSON.parse(raw);
+    if (raw) {
+      const arr = JSON.parse(raw);
+      if (Array.isArray(arr) && arr.length > 0) return arr;
+      // guard against empty stored list
+    }
   } catch {}
-  return Object.keys(calc.hourlyRates || {});
+  const defaults = Object.keys(calc.hourlyRates || {});
+  return defaults.length ? defaults : ['一般'];
 }
 function saveTypes(types) {
   localStorage.setItem(TYPE_KEY, JSON.stringify(types));
@@ -154,7 +159,8 @@ function wireTypeAdd() {
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       if (!confirm('確定要重設為預設類型？')) return;
-      typeLabels = Object.keys(calc.hourlyRates || {});
+      const defaults = Object.keys(calc.hourlyRates || {});
+      typeLabels = defaults.length ? defaults : ['一般'];
       saveTypes(typeLabels);
       renderTypeManager();
       refreshTaskTypeSelects();
