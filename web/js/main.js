@@ -333,6 +333,7 @@ const taxEl = document.getElementById('tax');
 const totalEl = document.getElementById('total');
 const saveStatusEl = document.getElementById('saveStatus');
 const exportBtn = document.getElementById('exportBtn');
+const includeTaxEl = document.getElementById('includeTax');
 
 const DRAFT_KEY = 'pricepilot_draft_v1';
 let saveTimer = null;
@@ -540,6 +541,18 @@ daysInput?.addEventListener('input', deriveBaseHourly);
 baseHourlyInput?.addEventListener('input', applySalaryToCalc);
 otMulInput?.addEventListener('input', applySalaryToCalc);
 
+// 稅額偏好保存（預設不勾選）
+const TAX_KEY = 'pricepilot_include_tax_v1';
+try {
+  const v = localStorage.getItem(TAX_KEY);
+  if (includeTaxEl) includeTaxEl.checked = v === '1';
+} catch {}
+includeTaxEl?.addEventListener('change', () => {
+  try {
+    localStorage.setItem(TAX_KEY, includeTaxEl.checked ? '1' : '0');
+  } catch {}
+});
+
 function validateForm() {
   let valid = true;
 
@@ -585,6 +598,8 @@ function recalc() {
     resultsCard.classList.add('d-none');
     return;
   }
+  const originalTax = calc.taxRate;
+  if (includeTaxEl) calc.taxRate = includeTaxEl.checked ? 0.05 : 0;
   const quote = calc.createQuote(
     projectNameEl.value.trim(),
     clientNameEl.value.trim(),
@@ -595,6 +610,7 @@ function recalc() {
       維護費用: Number(maintenanceEl.value || 0),
     }
   );
+  calc.taxRate = originalTax;
   showResults(quote);
 }
 
@@ -616,6 +632,8 @@ document.getElementById('exportBtn')?.addEventListener('click', () => {
   const { valid } = validateForm();
   if (!valid) return;
   setLoading(exportBtn, true);
+  const originalTax = calc.taxRate;
+  if (includeTaxEl) calc.taxRate = includeTaxEl.checked ? 0.05 : 0;
   const quote = calc.createQuote(
     projectNameEl.value.trim(),
     clientNameEl.value.trim(),
@@ -626,6 +644,7 @@ document.getElementById('exportBtn')?.addEventListener('click', () => {
       維護費用: Number(maintenanceEl.value || 0),
     }
   );
+  calc.taxRate = originalTax;
   try {
     exportQuoteToXlsx(quote);
   } finally {
@@ -634,7 +653,7 @@ document.getElementById('exportBtn')?.addEventListener('click', () => {
 });
 
 // live recalculation for top-level fields
-[projectNameEl, clientNameEl, hostingEl, domainEl, maintenanceEl].forEach((el) => {
+[projectNameEl, clientNameEl, hostingEl, domainEl, maintenanceEl, includeTaxEl].forEach((el) => {
   el?.addEventListener('input', recalc);
   el?.addEventListener('change', recalc);
 });
