@@ -476,8 +476,12 @@ const otMulInput = document.getElementById('otMultiplier');
 function applySalaryToCalc() {
   const base = Number(baseHourlyInput.value || salary.baseHourly || 0);
   const otm = Number(otMulInput.value || salary.otMultiplier || 1);
-  calc.baseHourlyRate = base;
-  calc.otMultiplier = otm;
+  const effective = Math.round(base * otm * 100) / 100;
+  // 將加班倍率算進時薪
+  calc.baseHourlyRate = effective;
+  calc.otMultiplier = 1;
+  const preview = document.getElementById('salaryPreview');
+  if (preview) preview.textContent = `${base} × ${otm} = ${effective}`;
   saveSalary({
     baseHourly: base,
     otMultiplier: otm,
