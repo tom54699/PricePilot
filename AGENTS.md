@@ -1,33 +1,38 @@
 # Repository Guidelines
 
-## Project Structure & Module Organization
-- Current layout: root contains `example.xlsx` (sample data) and `.kiro/` (tooling metadata).
-- Place application code in `src/`, tests in `tests/`, utility scripts in `scripts/`, and docs in `docs/`. Store larger data files in `data/`.
-- Mirror code and tests: `src/module/foo.py` → `tests/test_foo.py`; `src/module/index.ts` → `__tests__/index.test.ts`.
+This guide aligns with `.kiro/specs/quote-calculator-enhancement/{requirements,design,tasks}.md`.
 
-## Build, Test, and Development Commands
-- Python setup: `python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`.
-- Python tests: `pytest -q` (coverage: `pytest --cov=src`).
-- Node setup: `npm ci` (or `pnpm i --frozen-lockfile`).
-- Node tests: `npm test` (coverage: `npm test -- --coverage`).
-- Lint/format (recommended): Python `ruff check && ruff format`; JS/TS `eslint . && prettier -w .`.
+## Project Structure & Modules
+- Source layout (suggested):
+  - Python core: `src/python/price_calculator.py` (PriceCalculator, export)
+  - Web UI: `web/index.html`, `web/js/priceCalculator.js`
+  - Tests: `tests/python/test_price_calculator.py`, `web/__tests__/priceCalculator.test.ts`
+  - Data: `data/` (fixtures, e.g., `example.xlsx`)
+- Specs: see `.kiro/specs/quote-calculator-enhancement/` for scope and acceptance.
 
-## Coding Style & Naming Conventions
-- Python: 4‑space indent, type hints, snake_case for files/functions, PascalCase for classes. Prefer Black/Ruff-compatible formatting.
-- JS/TS: 2‑space indent, Prettier formatting, ESLint rules, PascalCase classes, kebab-case file names.
-- Keep modules small and focused; avoid circular imports. Name scripts with clear verbs, e.g., `scripts/build_data.py`.
+## Build, Test, and Dev
+- Python env: `python -m venv .venv && source .venv/bin/activate && pip install -r requirements.txt`
+- Run example: `python examples/example_usage.py` (see requirements 1.4)
+- Python tests: `pytest --cov=src/python -q`
+- Web install: `npm ci` in `web/`
+- Web tests: `npm test` (Vitest/Jest); build if needed: `npm run build`
+- Lint/format: Python `ruff check && ruff format`; Web `eslint . && prettier -w .`
 
-## Testing Guidelines
-- Frameworks: Python `pytest`; JS/TS `jest`/`vitest`.
-- Location: put tests beside code or under `tests/`. Patterns: Python `tests/test_*.py`; JS/TS `__tests__/*.(test|spec).ts`.
-- Aim ≥80% coverage. Include fixtures for spreadsheet-driven cases using `example.xlsx` or `data/fixtures/`.
+## Coding Style
+- Python: 4 spaces, type hints, snake_case; classes in PascalCase. Fix indentation and method scoping per design.md.
+- JS/TS: 2 spaces, Prettier + ESLint; files kebab-case; classes PascalCase.
+- Keep compute logic pure; UI logic separated (see design 架構圖)。
 
-## Commit & Pull Request Guidelines
-- Commits: follow Conventional Commits (`feat:`, `fix:`, `chore:`, `docs:`). Use imperative mood and keep scope focused.
-- PRs: include a clear description, linked issues, tests, and any doc updates. Add before/after screenshots for UI changes. Ensure CI passes and lint is clean.
+## Testing
+- Cover calculation logic (rates, multipliers, tax), input validation, and Excel export per requirements.md.
+- Naming: Python `tests/test_*.py`; Web `__tests__/*.(test|spec).ts`.
+- Target ≥80% coverage; include fixtures from `data/` and `example.xlsx`.
 
-## Security & Configuration Tips
-- Do not commit secrets. Use `.env` (ignored) and provide `.env.example` for required keys.
-- Keep large or sensitive datasets in `data/` and consider Git LFS. Anonymize sample data in `example.xlsx` when sharing.
-- Add/maintain `.gitignore` for `.venv`, `node_modules`, `.env`, build artifacts, and `data/raw/`.
+## Task Flow, Commits & PRs
+- Follow `.kiro/specs/quote-calculator-enhancement/tasks.md` checklist.
+- After each task: `git add -A && git commit -m "feat(task-<n>): <summary>"`.
+- Open PR with: scope, linked tasks/requirements, test evidence (logs/screenshots), and Excel output path when relevant.
 
+## Deploy (GitHub)
+- Push branch: `git push origin <branch>`; enable Actions. Optional Pages deploy via `.github/workflows/deploy.yml` (build web/ then upload).
+- Do not commit secrets; use `.env` and add `.env.example`.
