@@ -16,44 +16,165 @@ function saveTypes(types) {
   localStorage.setItem(TYPE_KEY, JSON.stringify(types));
 }
 let typeLabels = loadTypes();
+function setTypeMsg(msg, isError = false) {
+  const el = document.getElementById('typeMsg');
+  if (!el) return;
+  el.textContent = msg || '';
+  el.classList.toggle('text-danger', !!isError);
+}
+
 function renderTypeManager() {
   const listEl = document.getElementById('typeList');
   if (!listEl) return;
   listEl.innerHTML = '';
+  const ul = document.createElement('ul');
+  ul.className = 'list-group list-group-flush';
   typeLabels.forEach((label, idx) => {
-    const badge = document.createElement('span');
-    badge.className = 'badge bg-secondary me-2 mb-2';
-    badge.textContent = label;
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'btn btn-sm btn-outline-light ms-2';
-    btn.textContent = '×';
-    btn.title = '刪除';
-    btn.addEventListener('click', () => {
+    const li = document.createElement('li');
+    li.className = 'list-group-item d-flex align-items-center justify-content-between';
+    const left = document.createElement('div');
+    left.className = 'd-flex align-items-center gap-2 flex-wrap';
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'fw-medium';
+    nameSpan.textContent = label;
+
+    left.appendChild(nameSpan);
+
+    const right = document.createElement('div');
+    right.className = 'btn-group btn-group-sm';
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'btn btn-outline-secondary';
+    upBtn.innerHTML = '▲';
+    upBtn.title = '上移';
+    upBtn.disabled = idx === 0;
+    upBtn.addEventListener('click', () => {
+      if (idx === 0) return;
+      const [m] = typeLabels.splice(idx, 1);
+      typeLabels.splice(idx - 1, 0, m);
+      saveTypes(typeLabels);
+      renderTypeManager();
+      setTypeMsg('已重新排序');
+    });
+
+    const downBtn = document.createElement('button');
+    downBtn.className = 'btn btn-outline-secondary';
+    downBtn.innerHTML = '▼';
+    downBtn.title = '下移';
+    downBtn.disabled = idx === typeLabels.length - 1;
+    downBtn.addEventListener('click', () => {
+      if (idx === typeLabels.length - 1) return;
+      const [m] = typeLabels.splice(idx, 1);
+      typeLabels.splice(idx + 1, 0, m);
+      saveTypes(typeLabels);
+      renderTypeManager();
+      setTypeMsg('已重新排序');
+    });
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'btn btn-outline-primary';
+    editBtn.textContent = '編輯';
+    editBtn.addEventListener('click', () => {
+      const input = document.createElement('input');
+      input.className = 'form-control form-control-sm';
+      input.style.maxWidth = '240px';
+      input.value = label;
+      nameSpan.replaceWith(input);
+      input.focus();
+      const save = () => {
+        const v = input.value.trim();
+        if (!v) {
+          setTypeMsg('名稱不可為空', true);
+          return;
+        }
+        if (typeLabels.includes(v) && v !== label) {
+          setTypeMsg('名稱已存在', true);
+          return;
+        }
+        typeLabels[idx] = v;
+        saveTypes(typeLabels);
+        renderTypeManager();
+        setTypeMsg('已更新類型名稱');
+      };
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') save();
+        if (e.key === 'Escape') renderTypeManager();
+      });
+      input.addEventListener('blur', save);
+    });
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-outline-danger';
+    delBtn.textContent = '刪除';
+    delBtn.addEventListener('click', () => {
+      if (!confirm(`確定刪除類型「${label}」？`)) return;
       typeLabels.splice(idx, 1);
       saveTypes(typeLabels);
       renderTypeManager();
-      // 不改變既有列的值，但新增列會用更新後清單
+      setTypeMsg('已刪除類型');
     });
-    const wrapper = document.createElement('span');
-    wrapper.className = 'd-inline-flex align-items-center';
-    wrapper.appendChild(badge);
-    wrapper.appendChild(btn);
-    listEl.appendChild(wrapper);
+
+    right.appendChild(upBtn);
+    right.appendChild(downBtn);
+    right.appendChild(editBtn);
+    right.appendChild(delBtn);
+    li.appendChild(left);
+    li.appendChild(right);
+    ul.appendChild(li);
   });
+  listEl.appendChild(ul);
 }
+
 function wireTypeAdd() {
   const addBtn = document.getElementById('addTypeBtn');
   const input = document.getElementById('newTypeInput');
-  if (!addBtn || !input) return;
-  addBtn.addEventListener('click', () => {
-    const name = input.value.trim();
-    if (!name) return;
-    if (!typeLabels.includes(name)) {
+  const applyBtn = document.getElementById('applyTypesBtn');
+  const resetBtn = document.getElementById('resetTypesBtn');
+  if (addBtn && input) {
+    const add = () => {
+      const name = input.value.trim();
+      if (!name) return setTypeMsg('請輸入類型名稱', true);
+      if (typeLabels.includes(name)) return setTypeMsg('名稱已存在', true);
       typeLabels.push(name);
       saveTypes(typeLabels);
       renderTypeManager();
       input.value = '';
+      setTypeMsg('已新增類型');
+    };
+    addBtn.addEventListener('click', add);
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') add();
+    });
+  }
+  if (applyBtn) {
+    applyBtn.addEventListener('click', () => {
+      refreshTaskTypeSelects();
+      setTypeMsg('已套用至任務清單');
+    });
+  }
+  if (resetBtn) {
+    resetBtn.addEventListener('click', () => {
+      if (!confirm('確定要重設為預設類型？')) return;
+      typeLabels = Object.keys(calc.hourlyRates || {});
+      saveTypes(typeLabels);
+      renderTypeManager();
+      refreshTaskTypeSelects();
+      setTypeMsg('已重設為預設');
+    });
+  }
+}
+
+function refreshTaskTypeSelects() {
+  const rows = tasksTbody.querySelectorAll('tr');
+  rows.forEach((tr) => {
+    const typeSel = tr.querySelector('td:first-child select');
+    if (!typeSel) return;
+    const current = typeSel.value;
+    typeSel.innerHTML = typeLabels.map((k) => `<option value="${k}">${k}</option>`).join('');
+    if (typeLabels.includes(current)) {
+      typeSel.value = current;
+    } else if (typeLabels.length) {
+      typeSel.value = typeLabels[0];
     }
   });
 }

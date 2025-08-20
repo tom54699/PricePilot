@@ -88,10 +88,16 @@
       <section class="card mt-4" id="typeManager">
         <div class="card-body">
           <h5 class="card-title">任務類型管理（僅標題，不影響價格）</h5>
+          <p class="text-muted small">提示：此處僅管理下拉選單的標籤，不影響計價。</p>
           <div id="typeList" class="mb-3"></div>
-          <div class="input-group input-group-sm" style="max-width: 480px;">
-            <input id="newTypeInput" class="form-control" placeholder="新增類型名稱，如：資料分析" />
-            <button id="addTypeBtn" class="btn btn-outline-primary" type="button">新增</button>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="input-group input-group-sm" style="max-width: 420px;">
+              <input id="newTypeInput" class="form-control" placeholder="例如：資料分析、顧問、教育訓練" />
+              <button id="addTypeBtn" class="btn btn-outline-primary" type="button">新增</button>
+            </div>
+            <button id="applyTypesBtn" class="btn btn-sm btn-secondary" type="button">套用到任務清單</button>
+            <button id="resetTypesBtn" class="btn btn-sm btn-outline-danger" type="button">重設為預設</button>
+            <span id="typeMsg" class="small text-muted"></span>
           </div>
         </div>
       </section>
