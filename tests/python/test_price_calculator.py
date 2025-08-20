@@ -31,7 +31,12 @@ def test_create_quote_and_sums():
     assert quote["稅前總計"] == pre_tax
     assert quote["營業稅"] == tax
     assert quote["含稅總計"] == total
-    assert len(quote["報價項目"]) == 2  # third has 0 hours subtotal but still counted; two non-zero expected
+    # Include zero-hour tasks in the detailed list per requirements
+    assert len(quote["報價項目"]) == 3
+    # Verify the zero-hour task is present with subtotal 0
+    zero_item = quote["報價項目"][2]
+    assert zero_item["工時"] == 0
+    assert zero_item["小計"] == 0
 
 
 def test_export_to_excel_creates_two_sheets():
