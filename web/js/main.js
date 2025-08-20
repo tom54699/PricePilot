@@ -344,10 +344,13 @@ function setSaveStatus(msg) {
 function addTaskRow(prefill) {
   const tr = document.createElement('tr');
   const options = (typeLabels && typeLabels.length ? typeLabels : ['一般']);
+  const optionsHtml = options
+    .map((k, idx) => `<option value="${k}" ${idx === 0 ? 'selected' : ''}>${k}</option>`) 
+    .join('');
   tr.innerHTML = `
     <td>
       <select class="form-select form-select-sm">
-        ${options.map((k) => `<option value="${k}">${k}</option>`).join('')}
+        ${optionsHtml}
       </select>
     </td>
     <td>
