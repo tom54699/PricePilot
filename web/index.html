@@ -15,6 +15,36 @@
     <main class="container py-4">
       <h1 class="mb-4">報價計算器</h1>
 
+      <section class="card mb-4" id="salaryCard">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <span class="card-title h6 mb-0">時薪設定</span>
+          <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#salaryBody" aria-expanded="true" aria-controls="salaryBody">收合/展開</button>
+        </div>
+        <div id="salaryBody" class="collapse show">
+          <div class="card-body">
+            <div class="row g-3 align-items-end">
+              <div class="col-md-3">
+                <label class="form-label">月薪</label>
+                <input id="monthlySalary" type="number" min="0" class="form-control" placeholder="例如：60000" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">平均工作天數</label>
+                <input id="avgWorkDays" type="number" min="1" class="form-control" value="22" />
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">基本時薪</label>
+                <input id="baseHourly" type="number" min="0" class="form-control" placeholder="自動或手動填寫" />
+                <div class="form-text">若未填，將以 月薪/天數/8 計算</div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label">加班倍率</label>
+                <input id="otMultiplier" type="number" min="1" step="0.01" class="form-control" value="1" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <form id="quote-form" class="mb-4 needs-validation" novalidate>
         <div class="row g-3 mb-3">
           <div class="col-sm-6">

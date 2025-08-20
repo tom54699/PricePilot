@@ -455,6 +455,60 @@ function setInvalid(el, invalid) {
   el.classList.toggle('is-invalid', !!invalid);
 }
 
+// 時薪設定（基本時薪 / 加班倍率）與月薪推導
+const SALARY_KEY = 'pricepilot_salary_v1';
+function loadSalary() {
+  try {
+    const raw = localStorage.getItem(SALARY_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch {}
+  return { baseHourly: calc.baseHourlyRate, otMultiplier: calc.otMultiplier, monthly: '', days: 22 };
+}
+function saveSalary(obj) {
+  localStorage.setItem(SALARY_KEY, JSON.stringify(obj));
+}
+const salary = loadSalary();
+const monthlyInput = document.getElementById('monthlySalary');
+const daysInput = document.getElementById('avgWorkDays');
+const baseHourlyInput = document.getElementById('baseHourly');
+const otMulInput = document.getElementById('otMultiplier');
+
+function applySalaryToCalc() {
+  const base = Number(baseHourlyInput.value || salary.baseHourly || 0);
+  const otm = Number(otMulInput.value || salary.otMultiplier || 1);
+  calc.baseHourlyRate = base;
+  calc.otMultiplier = otm;
+  saveSalary({
+    baseHourly: base,
+    otMultiplier: otm,
+    monthly: Number(monthlyInput.value || 0),
+    days: Number(daysInput.value || 22),
+  });
+  recalc();
+}
+
+function deriveBaseHourly() {
+  const monthly = Number(monthlyInput.value || 0);
+  const days = Math.max(1, Number(daysInput.value || 22));
+  if (monthly > 0) {
+    const hourly = Math.round((monthly / days / 8) * 100) / 100;
+    baseHourlyInput.value = String(hourly);
+  }
+  applySalaryToCalc();
+}
+
+// initialize salary UI
+if (monthlyInput) monthlyInput.value = salary.monthly || '';
+if (daysInput) daysInput.value = salary.days || 22;
+if (baseHourlyInput) baseHourlyInput.value = salary.baseHourly ?? calc.baseHourlyRate;
+if (otMulInput) otMulInput.value = salary.otMultiplier ?? calc.otMultiplier;
+applySalaryToCalc();
+
+monthlyInput?.addEventListener('input', deriveBaseHourly);
+daysInput?.addEventListener('input', deriveBaseHourly);
+baseHourlyInput?.addEventListener('input', applySalaryToCalc);
+otMulInput?.addEventListener('input', applySalaryToCalc);
+
 function validateForm() {
   let valid = true;
 
