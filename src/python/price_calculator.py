@@ -187,6 +187,16 @@ def export_to_excel(quote: Quote, filename: Optional[str] = None) -> str:
     ws.append(["報價日期", quote.get("報價日期", "")])
     ws.append([])
 
+    # Task list (simple) near the top
+    ws.append(["報價項目"])  # section title
+    ws.append(["任務類型", "費用"])
+    for item in quote.get("報價項目", []) or []:
+        ws.append([
+            item.get("任務類型", ""),
+            item.get("小計", 0),
+        ])
+
+    ws.append([])
     ws.append(["開發小計", quote.get("開發小計", 0)])
     ws.append(["額外費用小計", quote.get("額外費用", {}).get("額外費用小計", 0)])
     # List individual extra costs

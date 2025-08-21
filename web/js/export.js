@@ -12,6 +12,14 @@ export function exportQuoteToXlsx(quote, filename) {
   summaryRows.push(['客戶名稱', quote?.客戶名稱 || '']);
   summaryRows.push(['報價日期', quote?.報價日期 || '']);
   summaryRows.push([]);
+  // Task list near top (simple)
+  summaryRows.push(['報價項目']);
+  summaryRows.push(['任務類型', '費用']);
+  for (const it of quote?.報價項目 || []) {
+    summaryRows.push([it.任務類型 || '', it.小計 || 0]);
+  }
+
+  summaryRows.push([]);
   summaryRows.push(['開發小計', quote?.開發小計 || 0]);
   const extras = quote?.額外費用 || {};
   summaryRows.push(['額外費用小計', extras?.額外費用小計 || 0]);
@@ -51,4 +59,3 @@ export function exportQuoteToXlsx(quote, filename) {
 }
 
 if (typeof window !== 'undefined') window.exportQuoteToXlsx = exportQuoteToXlsx;
-
